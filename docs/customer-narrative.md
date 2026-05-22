@@ -1,12 +1,12 @@
 # Optimizing Cortex AI Costs Without Sacrificing Quality
 
-A technical walkthrough for the US Regulatory & Regulatory Committee legal-document AI pipeline.
+A technical walkthrough for legal-document AI pipelines on Snowflake Cortex.
 
 ---
 
 ## 1. Where You Are Today
 
-Your team processes legal PDFs—governance bylaws, Regulatory Charter sections, compliance codes, CAS arbitration decisions—through a Snowflake Cortex AI pipeline. The current pattern:
+ Your team processes legal PDFs—statutes, federal regulations, compliance codes, agency rulings—through a Snowflake Cortex AI pipeline. The current pattern:
 
 1. **Every document** runs through both `AI_PARSE_DOCUMENT` modes (OCR *and* LAYOUT)
 2. `AI_COMPLETE` with `claude-4-sonnet` scores both extractions and picks the best
@@ -14,7 +14,7 @@ Your team processes legal PDFs—governance bylaws, Regulatory Charter sections,
 
 This works. Quality is high. But costs are growing past initial estimates because:
 
-- **Double-parsing is wasteful.** Digital PDFs (your bylaws, Regulatory Charter) don't need OCR. Scanned arbitration rulings don't benefit from LAYOUT mode. Running both on every document doubles your parse spend.
+- **Double-parsing is wasteful.** Digital PDFs (most modern federal regulations) don't need OCR. Scanned older rulings don't benefit from LAYOUT mode. Running both on every document doubles your parse spend.
 - **Dev reloads are expensive.** When your team iterates on the pipeline during development, the same 260 documents get re-parsed from scratch. That's 520 redundant `AI_PARSE_DOCUMENT` calls per reload.
 - **`claude-4-sonnet` is overkill for scoring.** The scoring task—"which extraction is better?"—is straightforward binary classification. A model 10x cheaper agrees with sonnet >95% of the time.
 - **Free-text JSON parsing requires retries.** Without structured outputs, malformed JSON triggers retry loops that burn tokens.
@@ -46,7 +46,7 @@ The pipeline runs on an X-Small warehouse (`SFE_LEGAL_DOC_AI_WH`), processing 1-
 
 **The optimization:** Instead of running both parse modes, classify the document first. The `SMART_PARSE` procedure tries LAYOUT mode and checks character yield: digital PDFs produce >500 chars of meaningful text per page from LAYOUT alone. If the yield is low, the document is scanned and needs OCR. Only the appropriate mode runs.
 
-**Quantitative savings:** ~50% on the parse step. For your corpus—predominantly digital legal documents with a minority of older scanned CAS rulings—most files skip OCR entirely. The LAYOUT probe is not wasted: its output becomes the final parse result for digital docs.
+**Quantitative savings:** ~50% on the parse step. For your corpus—predominantly digital legal documents with a minority of older scanned rulings—most files skip OCR entirely. The LAYOUT probe is not wasted: its output becomes the final parse result for digital docs.
 
 **The quality story:** The eval gate (`eval/32_lever2_routing_agreement.sql`) measures three things:
 1. **Routing agreement** with always-both baseline: does the router pick the same "best mode" that claude-4-sonnet picked? Gate: ≥95%.

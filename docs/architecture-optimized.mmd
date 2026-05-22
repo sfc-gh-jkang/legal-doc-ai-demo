@@ -9,7 +9,7 @@ graph LR
         CACHE{"PARSE_WITH_CACHE<br/>(hash check)<br/><i>0 cr if cached</i>"}
         ROUTE["SMART_PARSE<br/>(digital→LAYOUT, scanned→OCR)<br/><i>~1.36 cr/doc<br/>(LAYOUT only)</i>"]
         HAIKU["SCORE_STRUCTURED<br/>(claude-haiku-4-5)<br/><i>~0.0006 cr/doc</i>"]
-        EMBED["CHUNK_AND_EMBED<br/>(arctic-embed-l-v2.0)<br/><i>~0.026 cr/doc<br/>(one-time at ingest)</i>"]
+        EMBED["CHUNK_AND_EMBED<br/>(snowflake-arctic-embed-m-v1.5)<br/><i>~0.026 cr/doc<br/>(one-time at ingest)</i>"]
         SEARCH[("Cortex Search<br/>Service")]
         AGENT["LEGAL_DOC_AI_AGENT<br/>(top-5 chunks)<br/><i>~0.002 cr/question<br/>(haiku via retrieval)</i>"]
         ANSWER2[("Answer<br/>+ citations")]
