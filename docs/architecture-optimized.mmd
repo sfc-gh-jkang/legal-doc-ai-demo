@@ -1,17 +1,19 @@
 %% Optimized Pipeline (6 Levers Applied)
 %% PDF → SMART_PARSE (route) → PARSE_WITH_CACHE → haiku scorer (structured) → AI_EMBED → Cortex Search → Agent
+%% Credit values measured on 9-doc federal-regulatory corpus
+%% Source: ACCOUNT_USAGE.CORTEX_AI_FUNCTIONS_USAGE_HISTORY, last 7d
 
 graph LR
     subgraph "Optimized Pipeline — 6 Levers"
         PDF2[/"PDF Document"/]
-        CACHE{"PARSE_WITH_CACHE<br/>(hash check)<br/><i>0 credits if cached</i>"}
-        ROUTE["SMART_PARSE<br/>(route: digital→LAYOUT, scanned→OCR)<br/><i>~0.003 credits 1 mode</i>"]
-        HAIKU["SCORE_STRUCTURED<br/>(claude-haiku-4-5)<br/><i>~0.001 credits</i>"]
-        EMBED["CHUNK_AND_EMBED<br/>(arctic-embed-l-v2.0)<br/><i>~0.0004 credits</i>"]
+        CACHE{"PARSE_WITH_CACHE<br/>(hash check)<br/><i>0 cr if cached</i>"}
+        ROUTE["SMART_PARSE<br/>(digital→LAYOUT, scanned→OCR)<br/><i>~1.36 cr/doc<br/>(LAYOUT only)</i>"]
+        HAIKU["SCORE_STRUCTURED<br/>(claude-haiku-4-5)<br/><i>~0.0006 cr/doc</i>"]
+        EMBED["CHUNK_AND_EMBED<br/>(arctic-embed-l-v2.0)<br/><i>~0.026 cr/doc<br/>(one-time at ingest)</i>"]
         SEARCH[("Cortex Search<br/>Service")]
-        AGENT["LEGAL_DOC_AI_AGENT<br/>(top-5 chunks)<br/><i>~0.004 credits/question</i>"]
+        AGENT["LEGAL_DOC_AI_AGENT<br/>(top-5 chunks)<br/><i>~0.002 cr/question<br/>(haiku via retrieval)</i>"]
         ANSWER2[("Answer<br/>+ citations")]
-        TELEMETRY["DAILY_AI_COST<br/>(monitoring)<br/><i>0 credits</i>"]
+        TELEMETRY["DAILY_AI_COST<br/>(monitoring)<br/><i>0 cr</i>"]
 
         PDF2 --> CACHE
         CACHE -->|miss| ROUTE

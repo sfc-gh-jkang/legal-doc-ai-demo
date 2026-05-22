@@ -2504,7 +2504,7 @@ optically-recognized regardless of whether the PDF has embedded text. It's the
 fallback for scanned documents.
 
 the customer's current pattern always runs OCR mode, even on digital-text PDFs — that's
-the wasteful part. Cost: roughly **0.003 credits per 1K characters extracted**.
+the wasteful part. Cost: **~0.21 credits per doc** on this 9-doc corpus (range 0.004–0.49 depending on page count).
 
 **SQL inside the SPROC:**
 ```sql
@@ -2524,7 +2524,7 @@ structural elements: headings, tables, paragraph order, lists. The output is
 markdown-flavored text that round-trips well into chunkers and downstream LLMs.
 
 For a digital-text PDF, LAYOUT alone produces ~the same content as OCR, often
-with cleaner structure. Cost: similar to OCR, roughly **0.003 credits per 1K characters**.
+with cleaner structure. Cost: **~1.36 credits per doc** on this 9-doc corpus (range 0.03–3.24) — typically ~6× more than OCR mode per page.
 
 **SQL:**
 ```sql
@@ -2806,8 +2806,7 @@ agent:
    document.
 3. **Cites** the source `doc_name` and `page_no` for each chunk it used.
 
-Cost per question: roughly **0.004 credits** (vs ~0.06 credits for the
-full-document baseline) — a **~15× reduction** on Q&A.
+Cost per question: **~0.002 credits** (claude-haiku-4-5 over retrieved top-5 chunks) vs **~0.04 credits** for the full-document baseline (claude-4-sonnet over 50K-char context) — a **~20× reduction** on Q&A. Measured on this 9-doc corpus, last 7d via `CORTEX_AI_FUNCTIONS_USAGE_HISTORY`.
 
 **Agent spec:**
 ```sql

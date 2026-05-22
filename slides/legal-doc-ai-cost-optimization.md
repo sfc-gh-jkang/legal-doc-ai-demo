@@ -52,12 +52,14 @@ PDF → AI_PARSE_DOCUMENT(LAYOUT)  ─┘
 ```
 
 **What's happening:**
-- Every PDF runs **both** parse modes (~0.006 credits/doc for parsing alone)
-- `claude-4-sonnet` scores both extractions (~0.012 credits/doc)
+- Every PDF runs **both** parse modes (~1.57 credits/doc — OCR ~0.21 + LAYOUT ~1.36)
+- `claude-4-sonnet` scores both extractions (~0.007 credits/doc, 4K-char prompt)
 - Dev reloads re-parse all 260 documents from scratch
-- Q&A stuffs full documents into context (~0.060 credits/question)
+- Q&A stuffs full documents into context (~0.04 credits/question, 50K-char context)
 
-**Total per-doc baseline:** <!-- TODO: fill --> credits
+**Total per-doc baseline:** ~1.58 credits ingest + ~0.04 credits per Q&A question
+
+> Numbers measured on the 9-doc federal-regulatory corpus via `ACCOUNT_USAGE.CORTEX_AI_FUNCTIONS_USAGE_HISTORY`.
 
 ---
 
@@ -66,7 +68,7 @@ PDF → AI_PARSE_DOCUMENT(LAYOUT)  ─┘
 | # | Lever | Savings Target | Risk Level |
 |---|---|---|---|
 | 1 | Parse cache (hash dedup) | 100% on repeats | None |
-| 2 | Smart routing (digital→LAYOUT only) | ~50% on parse | Low |
+| 2 | Smart routing (digital→LAYOUT only) | ~13% on this all-digital corpus; up to ~87% on OCR-routed docs | Low |
 | 3 | Cheaper scorer (haiku vs sonnet) | 85-95% on score | Low |
 | 4 | Structured outputs (response_format) | 10-20% on output | None |
 | 5 | Embed + Cortex Search (retrieval Q&A) | 90%+ on Q&A | Medium |

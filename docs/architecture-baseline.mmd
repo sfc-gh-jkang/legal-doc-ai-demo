@@ -1,14 +1,16 @@
 %% Baseline Pipeline (Current customer baseline)
 %% PDF → OCR + LAYOUT → claude-4-sonnet scorer → result
+%% Credit values measured on 9-doc federal-regulatory corpus
+%% Source: ACCOUNT_USAGE.CORTEX_AI_FUNCTIONS_USAGE_HISTORY, last 7d
 
 graph LR
     subgraph "Baseline Pipeline — Current"
         PDF[/"PDF Document"/]
-        OCR["AI_PARSE_DOCUMENT<br/>(OCR mode)<br/><i>~0.003 credits</i>"]
-        LAYOUT["AI_PARSE_DOCUMENT<br/>(LAYOUT mode)<br/><i>~0.003 credits</i>"]
-        SCORER["AI_COMPLETE<br/>(claude-4-sonnet)<br/><i>~0.012 credits</i>"]
+        OCR["AI_PARSE_DOCUMENT<br/>(OCR mode)<br/><i>~0.21 cr/doc avg<br/>(0.004–0.49 range)</i>"]
+        LAYOUT["AI_PARSE_DOCUMENT<br/>(LAYOUT mode)<br/><i>~1.36 cr/doc avg<br/>(0.03–3.24 range)</i>"]
+        SCORER["AI_COMPLETE<br/>(claude-4-sonnet)<br/><i>~0.007 cr/doc<br/>(4K-char prompt)</i>"]
         RESULT[("Best extraction<br/>+ score")]
-        QA_FULL["AI_COMPLETE<br/>(full-doc context)<br/><i>~0.060 credits/question</i>"]
+        QA_FULL["AI_COMPLETE<br/>(full-doc context)<br/><i>~0.04 cr/question<br/>(50K-char context)</i>"]
         ANSWER[("Answer")]
 
         PDF --> OCR

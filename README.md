@@ -61,7 +61,7 @@ When a customer's L30 spend is concentrated in `AI_PARSE_DOCUMENT` + `AI_COMPLET
 | # | Lever | Expected Reduction | How |
 |---|-------|--------------------|-----|
 | 1 | Parse cache (file-hash dedup) | 100% on cache hits | `(file_hash, mode)` lookup in `PARSED_CACHE` skips re-parsing identical files. AI_SIMILARITY = 1.000 between cached and fresh on every doc. |
-| 2 | Smart routing (digital→LAYOUT, scanned→OCR) | up to ~50% on parse step | Cheap pre-classify before deciding parse mode. Routing agreement with always-both ≥ 95%; AI_SIMILARITY p10 ≥ 0.85; numeric fidelity ≥ 99%. |
+| 2 | Smart routing (digital→LAYOUT, scanned→OCR) | ~13% on this all-digital corpus; up to ~87% on docs that route to OCR-only | Cheap pre-classify before deciding parse mode. Routing agreement with always-both ≥ 95%; AI_SIMILARITY p10 ≥ 0.85; numeric fidelity ≥ 99%. |
 | 3 | Cheaper scorer model | ~10× cheaper per scoring call | haiku/mistral/llama match `claude-4-sonnet` at fraction of cost. Pareto frontier shows `claude-haiku-4-5` dominates at 92% scorer-step savings, 86% reasoning similarity, 100% mode agreement. |
 | 4 | Structured outputs | varies by retry rate | `response_format => TYPE OBJECT(...)` eliminates retry overhead. **Often MOOT** — when free-text retry rate is <3% the lever doesn't pay back; ship only when retries climb. |
 | 5 | AI_EMBED + Cortex Search | order-of-magnitude on Q&A token billing | Chunk + retrieve replaces full-doc re-reads. recall@5 = 1.0, MRR = 1.0, retrieval at 96.2% of full-doc baseline on 10 grounded Q&A pairs. |
@@ -104,27 +104,29 @@ When a customer's L30 spend is concentrated in `AI_PARSE_DOCUMENT` + `AI_COMPLET
             ┌───────┴───────┐                          ┌──────────┐
             ▼               ▼                          │  Cache   │──hit──► free
   AI_PARSE(OCR)     AI_PARSE(LAYOUT)                   └────┬─────┘
-            │               │                               │ miss
-            └───────┬───────┘                               ▼
-                    ▼                                  ┌──────────┐
-            claude-4-sonnet                            │  Route   │ digital→LAYOUT
-            (~0.012 cr)                                └────┬─────┘ scanned→OCR
+  ~0.21 cr/doc      ~1.36 cr/doc                            │ miss
+            │               │                               ▼
+            └───────┬───────┘                          ┌──────────┐
+                    ▼                                  │  Route   │ digital→LAYOUT
+            claude-4-sonnet                            │ ~1.36 cr │ scanned→OCR
+            ~0.007 cr/doc                              └────┬─────┘
                     │                                       ▼
                     ▼                                 ┌──────────────┐
-              best extract                            │ haiku score  │ ~0.001 cr
+              best extract                            │ haiku score  │ ~0.0006 cr/doc
                     │                                 └──────┬───────┘
                     ▼                                        ▼
         AI_COMPLETE(full doc)                          AI_EMBED + Cortex Search
-        ~0.060 cr / question                                 │
-                    │                                        ▼
-                    ▼                                 Cortex Agent
-                  answer                              ~0.004 cr / question
+        ~0.04 cr / question                            ~0.026 cr/doc (one-time)
+                    │                                        │
+                    ▼                                        ▼
+                  answer                              Cortex Agent
+                                                      ~0.002 cr / question
                                                              │
                                                              ▼
                                                        answer + citations
 ```
 
-> Credit values in the diagram are illustrative ballpark estimates that depend on document length and prompt size. For measured per-doc savings on this 9-PDF corpus see Tab 6 (`LEVER_SAVINGS`) in the Streamlit, or `docs/customer-pushback-prep.md` for the math.
+> Credit values measured on this 9-doc federal-regulatory corpus, last 7d, via `SNOWFLAKE.ACCOUNT_USAGE.CORTEX_AI_FUNCTIONS_USAGE_HISTORY`. Per-step ingest savings are modest (~12% per doc) because LAYOUT parse cost dominates and is unavoidable. The order-of-magnitude savings story comes from the **per-question Q&A path** — `~0.04 cr/q` baseline vs `~0.002 cr/q` optimized, a ~95% reduction per question. At customer-typical volumes (hundreds to thousands of questions per doc per year) the asymptotic total-pipeline savings approach ~92%. See `docs/customer-pushback-prep.md` for the math.
 
 ### Mermaid view (renders on GitHub)
 

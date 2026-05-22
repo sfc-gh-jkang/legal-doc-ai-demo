@@ -17,8 +17,8 @@
 %%         → AI_COMPLETE(full-doc context) per question
 %%         → Answer
 %%
-%% Cost per doc (parse+score): ~0.018 credits
-%% Cost per question (full-doc Q&A): ~0.060 credits
+%% Cost per doc (parse+score): ~1.57 credits (OCR ~0.21 + LAYOUT ~1.36 + sonnet score ~0.007)
+%% Cost per question (full-doc Q&A): ~0.04 credits (claude-4-sonnet, 50K-char context)
 %%
 %% ======================== OPTIMIZED ========================
 %%
@@ -32,29 +32,31 @@
 %%         → Answer + citations
 %%         -.-> DAILY_AI_COST (telemetry)
 %%
-%% Cost per doc (parse+score+embed): ~0.004 credits
-%% Cost per question (retrieval Q&A): ~0.004 credits
+%% Cost per doc (parse+score+embed): ~1.39 credits (LAYOUT ~1.36 + haiku ~0.0006 + embed ~0.026)
+%% Cost per question (retrieval Q&A): ~0.002 credits (claude-haiku-4-5 over top-5 chunks)
 %% Cost on cache hit (dev reload): 0.000 credits
 %%
+%% Numbers measured on 9-doc federal-regulatory corpus via
+%% ACCOUNT_USAGE.CORTEX_AI_FUNCTIONS_USAGE_HISTORY (last 7d).
 %% See rendered PNGs in docs/img/ for visual presentation.
 
 graph LR
     subgraph "Baseline Pipeline — Current"
         PDF[/"PDF"/]
-        OCR["OCR<br/>~0.003cr"]
-        LAYOUT["LAYOUT<br/>~0.003cr"]
-        SCORER["claude-4-sonnet<br/>~0.012cr"]
-        QA["full-doc Q&amp;A<br/>~0.060cr/q"]
+        OCR["OCR<br/>~0.21 cr/doc"]
+        LAYOUT["LAYOUT<br/>~1.36 cr/doc"]
+        SCORER["claude-4-sonnet<br/>~0.007 cr/doc"]
+        QA["full-doc Q&amp;A<br/>~0.04 cr/q"]
     end
 
     subgraph "Optimized Pipeline — 6 Levers"
         PDF2[/"PDF"/]
         CACHE{"Cache<br/>0cr hit"}
-        ROUTE["Route<br/>~0.003cr"]
-        HAIKU["haiku<br/>~0.001cr"]
-        EMBED["Embed<br/>~0.0004cr"]
+        ROUTE["Route<br/>~1.36 cr/doc"]
+        HAIKU["haiku<br/>~0.0006 cr/doc"]
+        EMBED["Embed<br/>~0.026 cr/doc"]
         SEARCH["Search<br/>indexed"]
-        AGENT["Agent<br/>~0.004cr/q"]
+        AGENT["Agent<br/>~0.002 cr/q"]
     end
 
     PDF --> OCR --> SCORER
