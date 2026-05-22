@@ -1,0 +1,21 @@
+# Legal Doc AI Corpus — Eval Q&A Pairs
+# STATUS: PLACEHOLDER — will be regenerated against new corpus.
+#
+# This file previously contained 30 hand-built Q&A pairs grounded in
+# customer-specific documents. After the corpus swap to a generic
+# legal-document demo, these pairs must be regenerated using:
+#
+#   uv run python scripts/generate_grounded_qa.py
+#
+# The generation script will produce new pairs sourced from whatever
+# PDFs are present in the @LEGAL_DOC_AI_DEMO.PDF_CORPUS stage.
+#
+# Question types to regenerate:
+#   - factual_lookup (single fact retrieval)
+#   - cross_document (synthesis across 2+ docs)
+#   - numerical (amounts, dates, thresholds)
+#   - procedural (multi-step processes)
+#   - comparative (differences between frameworks)
+#   - edge_case (boundary conditions, exceptions)
+
+pairs: []

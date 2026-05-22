@@ -1,0 +1,27 @@
+[project]
+name = "legal-doc-ai-app"
+version = "0.1.0"
+description = "Legal Doc AI PDF Cost & Quality Optimization Demo — Streamlit on Snowflake"
+requires-python = ">=3.11"
+dependencies = [
+    "streamlit[snowflake]>=1.35.0",
+    "snowflake-snowpark-python>=1.20.0",
+    "pandas>=2.0",
+    "plotly>=5.18",
+    "requests>=2.31",
+    "pypdfium2>=4.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["."]
+
+[tool.ruff]
+line-length = 160
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "W"]

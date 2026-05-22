@@ -1,0 +1,65 @@
+%% Architecture Diagram — Legal Document Cost Optimization
+%%
+%% This file contains BOTH diagrams as a combined reference.
+%% For rendering, use the individual files:
+%%   - docs/architecture-baseline.mmd  → docs/img/architecture-baseline.png
+%%   - docs/architecture-optimized.mmd → docs/img/architecture-optimized.png
+%%
+%% Render command:
+%%   npx @mermaid-js/mermaid-cli -i docs/architecture-baseline.mmd -o docs/img/architecture-baseline.png -b transparent -w 1600
+%%   npx @mermaid-js/mermaid-cli -i docs/architecture-optimized.mmd -o docs/img/architecture-optimized.png -b transparent -w 1600
+%%
+%% ======================== BASELINE ========================
+%%
+%% graph LR
+%%     PDF → AI_PARSE_DOCUMENT(OCR) + AI_PARSE_DOCUMENT(LAYOUT)
+%%         → AI_COMPLETE(claude-4-sonnet) scorer
+%%         → AI_COMPLETE(full-doc context) per question
+%%         → Answer
+%%
+%% Cost per doc (parse+score): ~0.018 credits
+%% Cost per question (full-doc Q&A): ~0.060 credits
+%%
+%% ======================== OPTIMIZED ========================
+%%
+%% graph LR
+%%     PDF → PARSE_WITH_CACHE (hash check)
+%%         → SMART_PARSE (route: 1 mode only)
+%%         → SCORE_STRUCTURED (claude-haiku-4-5)
+%%         → CHUNK_AND_EMBED (arctic-embed-l-v2.0)
+%%         → Cortex Search Service
+%%         → LEGAL_DOC_AI_AGENT (top-5 chunks)
+%%         → Answer + citations
+%%         -.-> DAILY_AI_COST (telemetry)
+%%
+%% Cost per doc (parse+score+embed): ~0.004 credits
+%% Cost per question (retrieval Q&A): ~0.004 credits
+%% Cost on cache hit (dev reload): 0.000 credits
+%%
+%% See rendered PNGs in docs/img/ for visual presentation.
+
+graph LR
+    subgraph "Baseline Pipeline — Current"
+        PDF[/"PDF"/]
+        OCR["OCR<br/>~0.003cr"]
+        LAYOUT["LAYOUT<br/>~0.003cr"]
+        SCORER["claude-4-sonnet<br/>~0.012cr"]
+        QA["full-doc Q&amp;A<br/>~0.060cr/q"]
+    end
+
+    subgraph "Optimized Pipeline — 6 Levers"
+        PDF2[/"PDF"/]
+        CACHE{"Cache<br/>0cr hit"}
+        ROUTE["Route<br/>~0.003cr"]
+        HAIKU["haiku<br/>~0.001cr"]
+        EMBED["Embed<br/>~0.0004cr"]
+        SEARCH["Search<br/>indexed"]
+        AGENT["Agent<br/>~0.004cr/q"]
+    end
+
+    PDF --> OCR --> SCORER
+    PDF --> LAYOUT --> SCORER
+    SCORER --> QA
+
+    PDF2 --> CACHE -->|miss| ROUTE --> HAIKU --> EMBED --> SEARCH --> AGENT
+    CACHE -->|hit| EMBED

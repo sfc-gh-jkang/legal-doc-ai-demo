@@ -1,0 +1,31 @@
+-- =============================================================================
+-- deploy.sql — Master orchestrator for Legal Doc AI Demo
+-- Expires: 2026-06-17
+-- Owner: john.kang@snowflake.com (sfc-gh-jkang)
+-- Connection: aws_spcs
+--
+-- Usage (run each file in order):
+--   for f in sql/01_setup.sql sql/02_stage.sql sql/03_pdf_corpus.sql \
+--            sql/10_baseline.sql sql/11_cache_layer.sql sql/12_smart_routing.sql \
+--            sql/13_cheap_scorer.sql sql/14_structured_outputs.sql \
+--            sql/15_embed_search.sql sql/16_agent.sql sql/20_cost_telemetry.sql; do
+--     snow sql -f "$f" -c aws_spcs
+--   done
+--
+-- Or via SnowSQL (supports !source):
+--   !source sql/01_setup.sql
+--   !source sql/02_stage.sql
+--   !source sql/03_pdf_corpus.sql
+--   !source sql/10_baseline.sql
+--   !source sql/11_cache_layer.sql
+--   !source sql/12_smart_routing.sql
+--   !source sql/13_cheap_scorer.sql
+--   !source sql/14_structured_outputs.sql
+--   !source sql/15_embed_search.sql
+--   !source sql/16_agent.sql
+--   !source sql/20_cost_telemetry.sql
+--
+-- Prerequisites:
+--   1. Run scripts/fetch_corpus.py to download public PDFs
+--   2. Run scripts/upload_pdfs.py to upload them to @PDF_STAGE
+-- =============================================================================

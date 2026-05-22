@@ -1,0 +1,33 @@
+data/
+__pycache__/
+.venv/
+*.parquet
+.env
+.cortex/plans/
+*.egg-info/
+dist/
+build/
+.ruff_cache/
+.pytest_cache/
+
+# Secrets & credentials
+.env.*
+!.env.example
+*.pem
+*.key
+*.p8
+credentials.json
+**/secrets/
+**/*secret*
+**/*credential*
+.streamlit/secrets.toml
+
+# Logs
+logs/
+*.log
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
+*.swp

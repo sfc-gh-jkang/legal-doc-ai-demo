@@ -1,0 +1,15 @@
+[project]
+name = "legal-doc-ai-scripts"
+version = "0.1.0"
+description = "Helper scripts for Legal Doc AI Demo — corpus download, upload, and benchmarking"
+requires-python = ">=3.11"
+dependencies = [
+    "snowflake-connector-python>=3.6.0",
+    "requests>=2.31.0",
+    "pypdf>=4.0.0",
+    "Pillow>=10.0.0",
+]
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"

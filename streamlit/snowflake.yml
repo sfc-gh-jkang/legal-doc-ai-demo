@@ -1,0 +1,14 @@
+# Streamlit-on-Snowflake deployment spec — Container Runtime (uv + pyproject.toml)
+definition_version: 2
+streamlit:
+  name: LEGAL_DOC_AI_APP
+  stage: SNOWFLAKE_EXAMPLE.LEGAL_DOC_AI_DEMO.STREAMLIT_STAGE
+  query_warehouse: SFE_LEGAL_DOC_AI_WH
+  main_file: app.py
+  title: "Legal Doc AI — Cost & Quality"
+  pages_dir: pages/
+  env_file: environment.yml
+  runtime:
+    type: CONTAINER
+    compute_pool: SFE_LEGAL_DOC_AI_POOL
+    external_access_integrations: []

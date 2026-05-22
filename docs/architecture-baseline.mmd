@@ -1,0 +1,27 @@
+%% Baseline Pipeline (Current customer baseline)
+%% PDF → OCR + LAYOUT → claude-4-sonnet scorer → result
+
+graph LR
+    subgraph "Baseline Pipeline — Current"
+        PDF[/"PDF Document"/]
+        OCR["AI_PARSE_DOCUMENT<br/>(OCR mode)<br/><i>~0.003 credits</i>"]
+        LAYOUT["AI_PARSE_DOCUMENT<br/>(LAYOUT mode)<br/><i>~0.003 credits</i>"]
+        SCORER["AI_COMPLETE<br/>(claude-4-sonnet)<br/><i>~0.012 credits</i>"]
+        RESULT[("Best extraction<br/>+ score")]
+        QA_FULL["AI_COMPLETE<br/>(full-doc context)<br/><i>~0.060 credits/question</i>"]
+        ANSWER[("Answer")]
+
+        PDF --> OCR
+        PDF --> LAYOUT
+        OCR --> SCORER
+        LAYOUT --> SCORER
+        SCORER --> RESULT
+        RESULT --> QA_FULL
+        QA_FULL --> ANSWER
+    end
+
+    style PDF fill:#f0f4ff,stroke:#29b5e8
+    style SCORER fill:#fff3e0,stroke:#ff9800
+    style QA_FULL fill:#fff3e0,stroke:#ff9800
+    style RESULT fill:#e8f5e9,stroke:#4caf50
+    style ANSWER fill:#e8f5e9,stroke:#4caf50
