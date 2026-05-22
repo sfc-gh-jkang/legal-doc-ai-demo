@@ -14,7 +14,7 @@ CREATE OR REPLACE AGENT LEGAL_DOC_AI_AGENT
     WITH PROFILE = '{"display_name": "Legal Doc AI Q and A Agent"}'
     FROM SPECIFICATION $$
 models:
-  orchestration: claude-4-sonnet
+  orchestration: auto
 
 instructions:
   system: |
