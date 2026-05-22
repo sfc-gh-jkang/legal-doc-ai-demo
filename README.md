@@ -85,13 +85,13 @@ When a customer's L30 spend is concentrated in `AI_PARSE_DOCUMENT` + `AI_COMPLET
 
 ![Baseline architecture](docs/architecture-baseline.png)
 
-`PDF → AI_PARSE_DOCUMENT(OCR) + AI_PARSE_DOCUMENT(LAYOUT) → claude-4-sonnet scorer → result`. Q&A re-feeds the full parsed text into `AI_COMPLETE` per question (~0.060 credits per question on a typical legal PDF).
+`PDF → AI_PARSE_DOCUMENT(OCR) + AI_PARSE_DOCUMENT(LAYOUT) → claude-4-sonnet scorer → result`. Q&A re-feeds the full parsed text into `AI_COMPLETE` per question — cost scales linearly with document length and question volume.
 
 ### Optimized pipeline (6 levers stacked)
 
 ![Optimized architecture](docs/architecture-optimized.png)
 
-`PDF → PARSE_WITH_CACHE → SMART_PARSE (one mode only) → claude-haiku-4-5 scorer → CHUNK + AI_EMBED → Cortex Search Service → Cortex Agent → answer + citations`. Cache hit on dev reload = 0 credits. Q&A cost drops ~15× because the agent only fetches the top-k relevant chunks, not the full document.
+`PDF → PARSE_WITH_CACHE → SMART_PARSE (one mode only) → claude-haiku-4-5 scorer → CHUNK + AI_EMBED → Cortex Search Service → Cortex Agent → answer + citations`. Cache hit on dev reload = 0 credits. Q&A drops to retrieval-scale because the agent only fetches the top-k relevant chunks instead of re-feeding the full document.
 
 ### ASCII view (renders in any terminal)
 
@@ -123,6 +123,8 @@ When a customer's L30 spend is concentrated in `AI_PARSE_DOCUMENT` + `AI_COMPLET
                                                              ▼
                                                        answer + citations
 ```
+
+> Credit values in the diagram are illustrative ballpark estimates that depend on document length and prompt size. For measured per-doc savings on this 9-PDF corpus see Tab 6 (`LEVER_SAVINGS`) in the Streamlit, or `docs/customer-pushback-prep.md` for the math.
 
 ### Mermaid view (renders on GitHub)
 
@@ -186,17 +188,17 @@ A persistent sidebar shows a clickable cheat sheet for all 11 levers — each ex
 
 Sourced from [govinfo.gov](https://www.govinfo.gov/) (US federal public-domain). Picked for length variance and structural complexity (sections, tables, citation cross-references) so the parse-mode tradeoff is visible.
 
-| File | Document | Approx. tokens (LAYOUT) |
+| File | Document | LAYOUT tokens (measured) |
 |------|----------|--------------------------|
-| `cfr_title12_part1_banking.pdf` | CFR Title 12 Part 1 (Banking) | ~15K |
-| `cfr_title16_part1_ftc.pdf` | CFR Title 16 Part 1 (FTC) | ~70K |
-| `plaw_104publ191_hipaa.pdf` | HIPAA | ~190K |
-| `plaw_107publ204_sarbanes_oxley.pdf` | Sarbanes-Oxley | ~75K |
-| `plaw_110publ343_eesa.pdf` | Emergency Economic Stabilization Act 2008 (TARP) | ~210K |
-| `plaw_111publ148_aca.pdf` | Affordable Care Act | ~640K |
-| `plaw_111publ203_dodd_frank.pdf` | Dodd-Frank | ~600K |
-| `plaw_115publ232_ndaa.pdf` | NDAA FY2018 | ~570K |
-| `plaw_118publ31_ndaa_2024.pdf` | NDAA FY2024 | ~700K |
+| `cfr_title12_part1_banking.pdf` | CFR Title 12 Part 1 (Banking) | 8K |
+| `cfr_title16_part1_ftc.pdf` | CFR Title 16 Part 1 (FTC) | 39K |
+| `plaw_107publ204_sarbanes_oxley.pdf` | Sarbanes-Oxley | 48K |
+| `plaw_104publ191_hipaa.pdf` | HIPAA | 117K |
+| `plaw_110publ343_eesa.pdf` | Emergency Economic Stabilization Act 2008 (TARP) | 118K |
+| `plaw_115publ232_ndaa.pdf` | NDAA FY2018 | 568K |
+| `plaw_111publ203_dodd_frank.pdf` | Dodd-Frank | 603K |
+| `plaw_111publ148_aca.pdf` | Affordable Care Act | 640K |
+| `plaw_118publ31_ndaa_2024.pdf` | NDAA FY2024 | 703K |
 
 The token-preflight lever (Lever 7) demonstrates how the largest docs would be **blocked** from a naive batch run that didn't size-check first.
 
@@ -222,8 +224,11 @@ snow sql -f eval/35_lever5_retrieval_quality.sql -c aws_spcs  # Q&A retrieval
 # 5. Run benchmark comparison
 snow sql -f sql/99_compare_all.sql -c aws_spcs
 
-# 6. Open the Streamlit
-open "https://app.snowflake.com/SFSENORTHAMERICA/JKANG_AWS_US_EAST_1_1/#/streamlit-apps/SNOWFLAKE_EXAMPLE.LEGAL_DOC_AI_DEMO.LEGAL_DOC_AI_APP"
+# 6. Find your Streamlit URL
+snow sql -c aws_spcs -q \
+  "SELECT SYSTEM\$GENERATE_STREAMLIT_URL_FROM_NAME('SNOWFLAKE_EXAMPLE.LEGAL_DOC_AI_DEMO.LEGAL_DOC_AI_APP');"
+# Then open the returned URL in your browser, or browse to it via Snowsight:
+# Snowsight  →  Projects  →  Streamlit  →  LEGAL_DOC_AI_APP
 ```
 
 ---
