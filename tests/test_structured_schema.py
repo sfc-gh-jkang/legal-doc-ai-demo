@@ -6,8 +6,8 @@ This test validates that the JSON schema matches what downstream consumers expec
 """
 
 import json
-import pytest
 
+import pytest
 
 # --- Schema Definition ---
 

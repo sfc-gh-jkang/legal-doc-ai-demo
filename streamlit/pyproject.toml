@@ -25,3 +25,5 @@ target-version = "py311"
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "W"]
+# Allow long lines in narrative/prompt strings (E501); we still keep code under 160.
+ignore = ["E501"]

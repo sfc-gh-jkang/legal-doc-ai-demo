@@ -8,7 +8,6 @@ This test uses fixture documents with known characteristics to verify routing lo
 
 import pytest
 
-
 # --- Routing Logic (mirrors sql/12_smart_routing.sql heuristics) ---
 
 

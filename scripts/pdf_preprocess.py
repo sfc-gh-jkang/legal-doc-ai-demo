@@ -9,7 +9,6 @@ Requires: pypdf, Pillow (declared in scripts/pyproject.toml)
 import argparse
 import io
 import json
-import os
 import subprocess
 import sys
 import tempfile
@@ -140,7 +139,7 @@ def main():
     parser.add_argument("--dst-stage", default="@SNOWFLAKE_EXAMPLE.LEGAL_DOC_AI_DEMO.PDF_STAGE_PROCESSED")
     args = parser.parse_args()
 
-    print(f"PDF Preprocessor")
+    print("PDF Preprocessor")
     print(f"  Source: {args.src_stage}")
     print(f"  Dest:   {args.dst_stage}")
     print()
@@ -176,7 +175,7 @@ def main():
             # Download
             local_src = download_from_stage(args.src_stage, filename, src_dir)
             if not local_src.exists():
-                print(f"    SKIP: download failed")
+                print("    SKIP: download failed")
                 continue
 
             # Process
@@ -205,7 +204,7 @@ def main():
 
     # Summary
     print(f"\n{'='*60}")
-    print(f"SUMMARY")
+    print("SUMMARY")
     print(f"{'='*60}")
     total_orig_pages = sum(r["original_pages"] for r in results)
     total_kept_pages = sum(r["kept_pages"] for r in results)

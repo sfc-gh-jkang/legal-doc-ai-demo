@@ -8,11 +8,8 @@ Usage:
     uv run python scripts/pypdf_fallback.py --stage @PDF_STAGE
 """
 import argparse
-import json
-import os
 import sys
 import tempfile
-from datetime import datetime
 from pathlib import Path
 
 try:
@@ -89,8 +86,6 @@ def main():
     with tempfile.TemporaryDirectory() as tmpdir:
         for stage_path in stage_files:
             file_name = Path(stage_path).name
-            # Remove stage prefix for GET
-            relative_path = stage_path.split("/", 1)[-1] if "/" in stage_path else stage_path
             print(f"\n  Processing: {file_name}")
 
             # Download from stage

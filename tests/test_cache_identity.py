@@ -8,8 +8,8 @@ Tests:
 """
 
 import hashlib
-import pytest
 
+import pytest
 
 # --- Fixtures ---
 

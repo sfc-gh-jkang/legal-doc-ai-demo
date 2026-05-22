@@ -1,0 +1,20 @@
+# Root ruff config — applies to scripts/ and tests/.
+# streamlit/pyproject.toml has its own [tool.ruff] block that takes precedence inside streamlit/.
+
+line-length = 160
+target-version = "py311"
+
+[lint]
+# E = pycodestyle errors, F = pyflakes, W = pycodestyle warnings, I = isort
+select = ["E", "F", "I", "W"]
+# Long lines are common in SQL strings and prompt templates; let line-length=160 absorb most of them.
+ignore = ["E501"]
+
+[lint.per-file-ignores]
+# Test files often have unused imports for fixtures
+"tests/**/*.py" = ["F401"]
+
+[format]
+# Use double quotes per Black convention
+quote-style = "double"
+indent-style = "space"

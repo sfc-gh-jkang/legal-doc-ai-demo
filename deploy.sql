@@ -18,6 +18,10 @@
 -- SNOWFLAKE_EXAMPLE database (only the LEGAL_DOC_AI_DEMO schema is touched).
 --
 -- Usage (run each file in order):
+--   # one-time prereqs (ACCOUNTADMIN; safe to re-run):
+--   snow sql -f sql/00_prereqs.sql -c <your-connection>
+--
+--   # core demo:
 --   for f in sql/01_setup.sql sql/02_stage.sql sql/03_pdf_corpus.sql \
 --            sql/10_baseline.sql sql/11_cache_layer.sql sql/12_smart_routing.sql \
 --            sql/13_cheap_scorer.sql sql/14_structured_outputs.sql \
@@ -25,7 +29,12 @@
 --     snow sql -f "$f" -c <your-connection>
 --   done
 --
+--   # optional Lever 10 spend guardrails (compile-only by default — DDL is in
+--   # /* */ blocks; uncomment in your fork before running):
+--   snow sql -f sql/30_resource_monitor.sql -c <your-connection>
+--
 -- Or via SnowSQL (supports !source):
+--   !source sql/00_prereqs.sql
 --   !source sql/01_setup.sql
 --   !source sql/02_stage.sql
 --   !source sql/03_pdf_corpus.sql
@@ -37,10 +46,11 @@
 --   !source sql/15_embed_search.sql
 --   !source sql/16_agent.sql
 --   !source sql/20_cost_telemetry.sql
+--   !source sql/30_resource_monitor.sql   -- optional, compile-only by default
 --
 -- Prerequisites:
---   1. Run scripts/fetch_corpus.py to download public PDFs from govinfo.gov
---   2. Run scripts/upload_pdfs.py to upload them to @PDF_STAGE
---   3. Confirm `PYPI_ACCESS_INTEGRATION` exists on your account
---      (required for Streamlit Container Runtime to install dependencies).
+--   1. Run sql/00_prereqs.sql once as ACCOUNTADMIN to create
+--      PYPI_ACCESS_INTEGRATION (Streamlit Container Runtime needs it).
+--   2. Run scripts/fetch_corpus.py to download public PDFs from govinfo.gov
+--   3. Run scripts/upload_pdfs.py to upload them to @PDF_STAGE
 -- =============================================================================

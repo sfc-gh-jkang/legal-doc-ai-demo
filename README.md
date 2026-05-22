@@ -1,5 +1,10 @@
 # Legal Doc AI — Cost & Quality Optimization Demo
 
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
+[![Release](https://img.shields.io/github/v/release/sfc-gh-jkang/legal-doc-ai-demo)](https://github.com/sfc-gh-jkang/legal-doc-ai-demo/releases)
+[![Last commit](https://img.shields.io/github/last-commit/sfc-gh-jkang/legal-doc-ai-demo/master)](https://github.com/sfc-gh-jkang/legal-doc-ai-demo/commits/master)
+[![CI](https://github.com/sfc-gh-jkang/legal-doc-ai-demo/actions/workflows/ci.yml/badge.svg)](https://github.com/sfc-gh-jkang/legal-doc-ai-demo/actions/workflows/ci.yml)
+
 > **11 cost-and-quality levers for Snowflake Cortex AI document processing — measured on 9 federal regulatory PDFs, gated by per-lever quality tests, packaged as a Streamlit-on-Snowflake Container Runtime app.**
 
 End-to-end demo for legal-document AI workloads on Snowflake. Shows the typical "double-parse + expensive scorer + full-doc Q&A" pattern, decomposes it into 11 independent optimization levers (6 cost + 5 operational), and proves each lever ships only when its quality gate passes. All cost numbers measured on this account via `CORTEX_AI_FUNCTIONS_USAGE_HISTORY` — no list-rate dollar conversions.

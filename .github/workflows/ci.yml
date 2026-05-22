@@ -1,0 +1,51 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  test:
+    name: pytest + ruff
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          enable-cache: true
+
+      - name: Set up Python 3.11
+        run: uv python install 3.11
+
+      - name: Install test dependencies
+        run: |
+          cd tests
+          uv sync --frozen
+
+      - name: Run pytest
+        run: |
+          cd tests
+          uv run pytest -q
+
+      - name: Ruff lint (streamlit)
+        run: |
+          uv tool run ruff check streamlit/
+
+      - name: Ruff lint (scripts)
+        run: |
+          uv tool run ruff check scripts/
+
+      - name: Ruff lint (tests)
+        run: |
+          uv tool run ruff check tests/
+
+      - name: Ruff format check (streamlit + scripts + tests)
+        run: |
+          uv tool run ruff format --check streamlit/ scripts/ tests/
+        continue-on-error: true  # don't fail CI on style-only drift in v1.0; revisit in v1.1

@@ -1740,7 +1740,6 @@ def tab_quality_cost():
     # Compute headline numbers
     n_pass = int((eval_df["VERDICT"] == "PASS").sum()) if not eval_df.empty and "VERDICT" in eval_df.columns else 0
     n_fail = int((eval_df["VERDICT"] == "FAIL").sum()) if not eval_df.empty and "VERDICT" in eval_df.columns else 0
-    n_moot = int((eval_df["VERDICT"] == "MOOT").sum()) if not eval_df.empty and "VERDICT" in eval_df.columns else 0
     n_total_gates = len(eval_df) if not eval_df.empty else 0
 
     # Risky doc count
