@@ -1605,39 +1605,45 @@ def tab_ask_corpus():
 
             response = requests.post(agent_url, json=payload, headers=headers, stream=True, timeout=120)
             response.raise_for_status()
+            # Force UTF-8 decoding — requests defaults to ISO-8859-1 when the
+            # SSE Content-Type omits a charset, which mangles em-dashes (U+2014)
+            # and other non-ASCII chars to "â\x80\x94" garbage.
+            response.encoding = "utf-8"
 
             # Parse SSE stream
             event_type = None
             data_buffer = ""
 
-            for line in response.iter_lines(decode_unicode=True):
-                if line is None:
-                    continue
-                line_str = line if isinstance(line, str) else line.decode("utf-8")
+            try:
+                for line in response.iter_lines(decode_unicode=True):
+                    if line is None:
+                        continue
+                    line_str = line if isinstance(line, str) else line.decode("utf-8")
 
-                if line_str.startswith("event:"):
-                    event_type = line_str[6:].strip()
-                elif line_str.startswith("data:"):
-                    data_buffer += line_str[5:].strip()
-                elif line_str == "":
-                    # Empty line = end of event
-                    if event_type and data_buffer:
-                        _process_agent_event(event_type, data_buffer, response_placeholder, status_placeholder, status_steps)
-                        if event_type == "response.text.delta":
-                            # Extract text from delta
-                            text = _extract_delta_text(data_buffer)
-                            if text:
-                                full_response += text
-                                response_placeholder.markdown(full_response + "▌")
-                    data_buffer = ""
-                    event_type = None
-
-            # Final render without cursor
-            if full_response:
-                response_placeholder.markdown(full_response)
-            else:
-                response_placeholder.markdown("_No response received from agent._")
-            status_placeholder.empty()
+                    if line_str.startswith("event:"):
+                        event_type = line_str[6:].strip()
+                    elif line_str.startswith("data:"):
+                        data_buffer += line_str[5:].strip()
+                    elif line_str == "":
+                        # Empty line = end of event
+                        if event_type and data_buffer:
+                            _process_agent_event(event_type, data_buffer, response_placeholder, status_placeholder, status_steps)
+                            if event_type == "response.text.delta":
+                                # Extract text from delta
+                                text = _extract_delta_text(data_buffer)
+                                if text:
+                                    full_response += text
+                                    response_placeholder.markdown(full_response + "▌")
+                        data_buffer = ""
+                        event_type = None
+            finally:
+                # Final render always runs — guarantees the streaming cursor (▌)
+                # is removed even if the SSE stream closes mid-event or raises.
+                if full_response:
+                    response_placeholder.markdown(full_response)
+                else:
+                    response_placeholder.markdown("_No response received from agent._")
+                status_placeholder.empty()
 
         except FileNotFoundError:
             full_response = "_OAuth token not found. Deploy to Container Runtime first._"
