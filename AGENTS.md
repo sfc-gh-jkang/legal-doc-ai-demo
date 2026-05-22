@@ -1,7 +1,7 @@
 # AGENTS.md — Legal Doc AI Demo
 
 ## Connection Routing
-- All SQL: connection `aws_spcs` (SFSENORTHAMERICA-JKANG_AWS_US_EAST_1_1)
+- All SQL: a Snowflake CLI connection alias of your choice (this repo's author uses `aws_spcs` on a single SE demo account; substitute your own)
 - Role context: SYSADMIN for DDL, LEGAL_DOC_AI_RL for runtime
 - Warehouse: `SFE_LEGAL_DOC_AI_WH` (X-Small)
 

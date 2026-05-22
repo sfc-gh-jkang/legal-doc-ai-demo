@@ -1,15 +1,28 @@
 -- =============================================================================
 -- deploy.sql — Master orchestrator for Legal Doc AI Demo
--- Expires: 2026-06-17
+--
+-- ⚠️ NON-PRODUCTION SAMPLE. SE demo only — not for production deployment.
+-- ⚠️ Suggested rotation: re-deploy fresh every 30 days; teardown when done.
+--
 -- Owner: john.kang@snowflake.com (sfc-gh-jkang)
--- Connection: aws_spcs
+-- Verified GA on AWS US East 1 as of May 2026. Cortex AI feature regional
+-- availability changes — check current status before deploying:
+--   https://docs.snowflake.com/en/user-guide/snowflake-cortex/aisql
+--   https://docs.snowflake.com/en/user-guide/snowflake-cortex/cortex-search
+--   https://docs.snowflake.com/en/user-guide/snowflake-cortex/cortex-agents
+--
+-- Connection: substitute your own Snowflake CLI alias (this repo's author uses `aws_spcs`)
+--
+-- All `CREATE` statements use `IF NOT EXISTS` or `OR REPLACE` — re-running
+-- this deploy is idempotent and will not clobber a customer's existing
+-- SNOWFLAKE_EXAMPLE database (only the LEGAL_DOC_AI_DEMO schema is touched).
 --
 -- Usage (run each file in order):
 --   for f in sql/01_setup.sql sql/02_stage.sql sql/03_pdf_corpus.sql \
 --            sql/10_baseline.sql sql/11_cache_layer.sql sql/12_smart_routing.sql \
 --            sql/13_cheap_scorer.sql sql/14_structured_outputs.sql \
 --            sql/15_embed_search.sql sql/16_agent.sql sql/20_cost_telemetry.sql; do
---     snow sql -f "$f" -c aws_spcs
+--     snow sql -f "$f" -c <your-connection>
 --   done
 --
 -- Or via SnowSQL (supports !source):
@@ -26,6 +39,8 @@
 --   !source sql/20_cost_telemetry.sql
 --
 -- Prerequisites:
---   1. Run scripts/fetch_corpus.py to download public PDFs
+--   1. Run scripts/fetch_corpus.py to download public PDFs from govinfo.gov
 --   2. Run scripts/upload_pdfs.py to upload them to @PDF_STAGE
+--   3. Confirm `PYPI_ACCESS_INTEGRATION` exists on your account
+--      (required for Streamlit Container Runtime to install dependencies).
 -- =============================================================================

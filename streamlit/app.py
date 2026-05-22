@@ -1580,9 +1580,12 @@ def tab_ask_corpus():
                 st.session_state.messages.append({"role": "assistant", "content": "_Agent chat requires Container Runtime deployment._"})
                 return
 
-            # Build agent request
-            default_host = "sfsenorthamerica-jkang_aws_us_east_1_1.snowflakecomputing.com"
-            snowflake_host = os.environ.get("SNOWFLAKE_HOST", default_host)
+            # Build agent request — SNOWFLAKE_HOST is auto-set in Container Runtime;
+            # the env var is the canonical way and there is no portable default.
+            snowflake_host = os.environ.get("SNOWFLAKE_HOST")
+            if not snowflake_host:
+                st.error("SNOWFLAKE_HOST environment variable not set. The agent chat requires Container Runtime deployment where this is auto-injected.")
+                return
             agent_url = f"https://{snowflake_host}/api/v2/databases/{DATABASE}/schemas/{SCHEMA}/agents/LEGAL_DOC_AI_AGENT:run"
 
             messages = [

@@ -16,8 +16,11 @@ snow sql -c aws_spcs -q "ALTER COMPUTE POOL SFE_LEGAL_DOC_AI_POOL RESUME IF SUSP
 # 2. Refresh Snowsight session token if stale (avoids browser-SSO popup mid-demo)
 snow connection test -c aws_spcs
 
-# 3. Open the Streamlit in Prisma Access Browser
-open "https://app.snowflake.com/SFSENORTHAMERICA/JKANG_AWS_US_EAST_1_1/#/streamlit-apps/SNOWFLAKE_EXAMPLE.LEGAL_DOC_AI_DEMO.LEGAL_DOC_AI_APP"
+# 3. Open the Streamlit (URL is account-specific — get yours via SQL)
+snow sql -c aws_spcs -q \
+  "SELECT SYSTEM\$GENERATE_STREAMLIT_URL_FROM_NAME('SNOWFLAKE_EXAMPLE.LEGAL_DOC_AI_DEMO.LEGAL_DOC_AI_APP');"
+# Then open the returned URL in your browser, or browse via Snowsight:
+# Snowsight  →  Projects  →  Streamlit  →  LEGAL_DOC_AI_APP
 
 # 4. Optional — take a snapshot of the demo state for rollback safety
 bash scripts/snapshot_demo_state.sh

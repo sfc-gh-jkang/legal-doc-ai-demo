@@ -1,5 +1,22 @@
 # Eval Framework — Legal Doc AI PDF Cost Optimization
 
+> **Cost expectations for cold-running the eval suite (measured on the 9-doc corpus, May 2026):**
+>
+> | Script | What it does | Approx. cost |
+> |---|---|---|
+> | `30_eval_setup.sql` | Creates EVAL_RUNS / EVAL_PER_DOC / EVAL_QA_PAIRS / EVAL_QA_RESULTS tables | ~0 cr (DDL only) |
+> | `31_lever1_cache_identity.sql` | Cache-identity verification | ~0 cr (compares cached parses) |
+> | `32_lever2_routing_agreement.sql` | Routing agreement vs. always-both | ~0 cr (re-uses cached parses) |
+> | `33_lever3_model_matrix.sql` | 5 models × 9 docs scoring matrix | **~0.06 cr** (45 AI_COMPLETE calls) |
+> | `34_lever4_structured_fielddiff.sql` | Structured-output retry-rate measurement | ~0 cr (uses cached scoring results) |
+> | `35_lever5_retrieval_quality.sql` | 10 grounded Q&A pairs × 2 methods | **~0.08 cr** (haiku retrieval ~0.002/q + sonnet full-doc ~0.04/q) |
+> | `40_pareto_frontier.sql` | Pareto frontier view definition | ~0 cr (DDL) |
+> | `50_eval_summary.sql` | EVAL_SUMMARY_V verdict view | ~0 cr (DDL) |
+>
+> Total cold eval suite: **~0.15 cr.** Add full pipeline ingest of all 9 PDFs (sql/ pipeline) for ~14 cr (LAYOUT parse dominates at ~1.36 cr/doc avg). Skip the 3 largest PDFs (NDAA-2024, ACA, Dodd-Frank) to bound first-run cost to ~3-4 cr.
+
+---
+
 ## Methodology
 
 Every cost lever must prove it doesn't degrade quality before we claim savings.
